@@ -488,19 +488,3 @@ huesc main.hues -o main --release
 **Compiler:** GPL-2.0
 
 **Your code:** No restrictions. Use HuesLang for open source, closed source, commercial projects — anything you want.
-
----
-
-## Links
-
-- GitHub: [github.com/username/hueslang]
-- Documentation: [hueslang.dev]
-- Discord: [discord.gg/hueslang]
-
----
-
-**Документация готова!**
-
-Сохрани как `README.md` или `DOCUMENTATION.md`.
-
-**Теперь — npeg и грамматика?** 🚀
