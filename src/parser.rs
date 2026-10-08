@@ -193,6 +193,7 @@ impl Parser {
         if !matches!(self.tokens.peek(), Some(Token::DotDot)) {
             return Err("Syntax Err".into());
         }
+        self.tokens.next(); // ИСПРАВЛЕНИЕ БАГА ЗАБЫЛ NEXT
         let end = self.parse_expr()?;
         let body = self.parse_block()?;
         Ok(AST::For {
