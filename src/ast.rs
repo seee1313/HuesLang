@@ -88,5 +88,5 @@ pub enum AST {
         end: Expr,
         body: Vec<AST>,
     },
-    Break
+    Break,
 }

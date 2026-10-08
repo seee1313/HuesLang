@@ -370,8 +370,12 @@ impl Parser {
             let arg_type = self.parse_type()?;
             args.push((arg_name, arg_type));
 
-            if matches!(self.tokens.peek(), Some(Token::Comma)) {
-                self.tokens.next();
+            match self.tokens.peek() {
+                Some(Token::Comma) => {
+                    self.tokens.next();
+                }
+                Some(Token::RParen) => continue,
+                _ => return Err("Expected arg or ','".into()),
             }
         }
         self.tokens.next();

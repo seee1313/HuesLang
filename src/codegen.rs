@@ -227,7 +227,6 @@ impl<'ctx> CodeGen<'ctx> {
                 self.loop_exit_blocks.pop();
             }
 
-
             AST::While { condition, body } => {
                 let func = self.current_function.expect("while outside function");
                 let cond_block = self.context.append_basic_block(func, "while_cond");
@@ -266,7 +265,12 @@ impl<'ctx> CodeGen<'ctx> {
                 self.loop_exit_blocks.pop();
             }
 
-            AST::For { var, start, end, body } => {
+            AST::For {
+                var,
+                start,
+                end,
+                body,
+            } => {
                 let func = self.current_function.expect("for outside function");
                 let cond_block = self.context.append_basic_block(func, "for_cond");
                 let body_block = self.context.append_basic_block(func, "for_body");
@@ -277,7 +281,9 @@ impl<'ctx> CodeGen<'ctx> {
 
                 let i64_ty = Type::I64;
                 let ptr = self.create_entry_block_alloca(var, &i64_ty);
-                self.builder.build_store(ptr, start_val).expect("for init store failed");
+                self.builder
+                    .build_store(ptr, start_val)
+                    .expect("for init store failed");
                 self.set_var(var.clone(), i64_ty, ptr);
 
                 self.loop_exit_blocks.push(after_block);
@@ -287,12 +293,19 @@ impl<'ctx> CodeGen<'ctx> {
                     .expect("br to for_cond failed");
                 self.builder.position_at_end(cond_block);
 
-                let var_val = self.builder
+                let var_val = self
+                    .builder
                     .build_load(self.context.i64_type(), ptr, var)
                     .expect("for var load failed")
                     .into_int_value();
-                let cmp = self.builder
-                    .build_int_compare(inkwell::IntPredicate::SLT, var_val, end_val.into_int_value(), "for_cmp")
+                let cmp = self
+                    .builder
+                    .build_int_compare(
+                        inkwell::IntPredicate::SLT,
+                        var_val,
+                        end_val.into_int_value(),
+                        "for_cmp",
+                    )
                     .expect("for cmp failed");
                 self.builder
                     .build_conditional_branch(cmp, body_block, after_block)
@@ -307,15 +320,19 @@ impl<'ctx> CodeGen<'ctx> {
 
                 let current_block = self.builder.get_insert_block().unwrap();
                 if current_block.get_terminator().is_none() {
-                    let loaded = self.builder
+                    let loaded = self
+                        .builder
                         .build_load(self.context.i64_type(), ptr, var)
                         .expect("for inc load failed")
                         .into_int_value();
                     let one = self.context.i64_type().const_int(1, false);
-                    let inc = self.builder
+                    let inc = self
+                        .builder
                         .build_int_add(loaded, one, "for_inc")
                         .expect("for inc failed");
-                    self.builder.build_store(ptr, inc).expect("for inc store failed");
+                    self.builder
+                        .build_store(ptr, inc)
+                        .expect("for inc store failed");
                     self.builder
                         .build_unconditional_branch(cond_block)
                         .expect("for backedge failed");
